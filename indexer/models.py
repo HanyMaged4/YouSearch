@@ -4,7 +4,7 @@ from django.db import models
 class Videos(models.Model):
     videoID = models.CharField(max_length=64 , primary_key=True)
     title = models.CharField(max_length=255)
-    videoURL = models.URLField(max_length=500)
+    videoURL = models.URLField(max_length=500,)
 
     def __str__(self):
         return f"{self.title} ({self.videoID})"
@@ -36,5 +36,3 @@ class Indexing(models.Model):
     def __str__(self):
         return f"{self.word.word} in {self.video.videoID} [{self.start}-{self.end}]"
     
-class VideosIDs(models.Model):
-    VedioId = models.CharField(primary_key=True , max_length=1024)
