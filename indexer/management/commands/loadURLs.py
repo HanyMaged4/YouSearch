@@ -79,10 +79,10 @@ class Command(BaseCommand):
                         text = snippet['text'] if isinstance(snippet, dict) else getattr(snippet, 'text', '')
                         words = set(re.findall(r"\w+", text.lower()))
                         
-                        for w in words:
+                        for pos, w in enumerate(words):
                             word_obj = word_cache.get(w)
                             if word_obj:
-                                indexing_to_create.append(Indexing(word=word_obj, sentence=sentence_obj))
+                                indexing_to_create.append(Indexing(word=word_obj, sentence=sentence_obj,posetion = pos))
                     
                     Indexing.objects.bulk_create(indexing_to_create, batch_size=1000)
                     print(f"Bulk created {len(indexing_to_create)} indexing records.")
