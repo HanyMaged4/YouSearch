@@ -24,7 +24,7 @@ class Sentences(models.Model):
     video = models.ForeignKey(Videos , on_delete=models.CASCADE)
     sentence = models.CharField(max_length=2064)
     start = models.FloatField()
-    end = models.FloatField()
+    duration = models.FloatField()
 
 class Indexing(models.Model):
     word = models.ForeignKey(Words , on_delete=models.CASCADE)
