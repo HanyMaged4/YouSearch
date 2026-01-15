@@ -4,7 +4,7 @@ from django.db import models
 class Videos(models.Model):
     videoID = models.CharField(max_length=64 , primary_key=True)
     title = models.CharField(max_length=255)
-    videoURL = models.URLField(max_length=500,)
+    videoURL = models.URLField(max_length=500,unique=True)
 
     def __str__(self):
         return f"{self.title} ({self.videoID})"
