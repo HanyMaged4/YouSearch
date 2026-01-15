@@ -13,7 +13,6 @@ class Videos(models.Model):
 class Words(models.Model):
     wordID = models.AutoField(primary_key=True)
     word = models.CharField(max_length=255, unique=True, db_index=True)
-    cnt = models.IntegerField(default=0)
 
     def __str__(self):
         return f"{self.word} ({self.wordID})"
