@@ -28,9 +28,10 @@ class Sentences(models.Model):
 class Indexing(models.Model):
     word = models.ForeignKey(Words , on_delete=models.CASCADE)
     sentence = models.ForeignKey(Sentences , on_delete=models.CASCADE)
-    
+    posetion = models.IntegerField(null=False)
+
     class Meta:
-        unique_together = ('word', 'sentence')
+        unique_together = ('word', 'sentence' , 'posetion')
     
     def __str__(self):
         return f"{self.word.word} in {self.video.videoID} [{self.start}-{self.end}]"
