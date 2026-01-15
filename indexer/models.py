@@ -35,3 +35,6 @@ class Indexing(models.Model):
     
     def __str__(self):
         return f"{self.word.word} in {self.video.videoID} [{self.start}-{self.end}]"
+    
+class VideosIDs(models.Model):
+    VedioId = models.CharField(primary_key=True , max_length=1024)
