@@ -77,17 +77,15 @@ class Command(BaseCommand):
                     for i, snippet in enumerate(transcript):
                         sentence_obj = created_sentences[i]
                         text = snippet['text'] if isinstance(snippet, dict) else getattr(snippet, 'text', '')
-                        words = set(re.findall(r"\w+", text.lower()))
-                        
-                        for pos, w in enumerate(words):
+                        words_in_order = re.findall(r"\w+", text.lower())
+                        for pos, w in enumerate(words_in_order):
                             word_obj = word_cache.get(w)
                             if word_obj:
-                                indexing_to_create.append(Indexing(word=word_obj, sentence=sentence_obj,posetion = pos))
+                                indexing_to_create.append(Indexing(word=word_obj, sentence=sentence_obj, posetion=pos))
                     
                     Indexing.objects.bulk_create(indexing_to_create, batch_size=1000)
                     print(f"Bulk created {len(indexing_to_create)} indexing records.")
                     print(f"Finished processing: {title}")
-
             except Exception as e:
                 print(f"Error processing {url}: {e}")
 
