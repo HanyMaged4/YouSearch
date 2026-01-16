@@ -1,0 +1,407 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Youglish Clone - Search Words in Videos</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            min-height: 100vh;
+            color: #fff;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        header {
+            text-align: center;
+            padding: 40px 0;
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            background: linear-gradient(90deg, #ff6b6b, #4ecdc4);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .subtitle {
+            color: #a0a0a0;
+            font-size: 1.1rem;
+        }
+
+        .search-box {
+            display: flex;
+            justify-content: center;
+            margin: 30px 0;
+            gap: 10px;
+        }
+
+        #searchInput {
+            width: 100%;
+            max-width: 500px;
+            padding: 15px 20px;
+            font-size: 1.1rem;
+            border: none;
+            border-radius: 50px;
+            background: rgba(255, 255, 255, 0.1);
+            color: #fff;
+            outline: none;
+            transition: all 0.3s ease;
+        }
+
+        #searchInput::placeholder {
+            color: #888;
+        }
+
+        #searchInput:focus {
+            background: rgba(255, 255, 255, 0.15);
+            box-shadow: 0 0 20px rgba(78, 205, 196, 0.3);
+        }
+
+        #searchBtn {
+            padding: 15px 30px;
+            font-size: 1.1rem;
+            border: none;
+            border-radius: 50px;
+            background: linear-gradient(90deg, #4ecdc4, #44a08d);
+            color: #fff;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        #searchBtn:hover {
+            transform: scale(1.05);
+            box-shadow: 0 5px 20px rgba(78, 205, 196, 0.4);
+        }
+
+        #searchBtn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
+        .video-section {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin-top: 30px;
+        }
+
+        #videoPlayer {
+            width: 100%;
+            max-width: 800px;
+            aspect-ratio: 16/9;
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
+            background: #000;
+        }
+
+        #videoPlayer iframe {
+            width: 100%;
+            height: 100%;
+            border: none;
+        }
+
+        .controls {
+            display: flex;
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .control-btn {
+            padding: 12px 25px;
+            font-size: 1rem;
+            border: none;
+            border-radius: 25px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        #prevBtn {
+            background: rgba(255, 255, 255, 0.1);
+            color: #fff;
+        }
+
+        #nextBtn {
+            background: linear-gradient(90deg, #ff6b6b, #ee5a5a);
+            color: #fff;
+        }
+
+        .control-btn:hover:not(:disabled) {
+            transform: scale(1.05);
+        }
+
+        .control-btn:disabled {
+            opacity: 0.4;
+            cursor: not-allowed;
+        }
+
+        .result-info {
+            margin-top: 20px;
+            padding: 15px 25px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 10px;
+            text-align: center;
+        }
+
+        .result-count {
+            font-size: 1.1rem;
+            color: #4ecdc4;
+        }
+
+        .current-result {
+            color: #888;
+            margin-top: 5px;
+        }
+
+        .no-results {
+            text-align: center;
+            padding: 50px;
+            color: #888;
+        }
+
+        .no-results h3 {
+            font-size: 1.5rem;
+            margin-bottom: 10px;
+            color: #ff6b6b;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 50px;
+        }
+
+        .spinner {
+            width: 50px;
+            height: 50px;
+            border: 4px solid rgba(255, 255, 255, 0.1);
+            border-top-color: #4ecdc4;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 20px;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .hidden {
+            display: none !important;
+        }
+
+        .keyboard-hint {
+            margin-top: 15px;
+            color: #666;
+            font-size: 0.9rem;
+        }
+
+        kbd {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 3px 8px;
+            border-radius: 4px;
+            font-family: monospace;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🎬 Youglish Clone</h1>
+            <p class="subtitle">Search for words and phrases in YouTube videos</p>
+        </header>
+
+        <div class="search-box">
+            <input type="text" id="searchInput" placeholder="Enter words to search (e.g., 'whole bunch')" autofocus>
+            <button id="searchBtn">Search</button>
+        </div>
+
+        <div id="loadingSection" class="loading hidden">
+            <div class="spinner"></div>
+            <p>Searching videos...</p>
+        </div>
+
+        <div id="noResults" class="no-results hidden">
+            <h3>No results found</h3>
+            <p>Try searching for different words or phrases</p>
+        </div>
+
+        <div id="resultsSection" class="video-section hidden">
+            <div id="videoPlayer"></div>
+            
+            <div class="controls">
+                <button id="prevBtn" class="control-btn">← Previous</button>
+                <button id="nextBtn" class="control-btn">Next →</button>
+            </div>
+
+            <div class="result-info">
+                <p class="result-count"><span id="currentIndex">1</span> of <span id="totalResults">0</span> results</p>
+                <p class="current-result">Playing at <span id="currentTime">0:00</span></p>
+            </div>
+
+            <p class="keyboard-hint">Use <kbd>←</kbd> <kbd>→</kbd> arrow keys to navigate</p>
+        </div>
+    </div>
+
+    <!-- YouTube IFrame API -->
+    <script src="https://www.youtube.com/iframe_api"></script>
+    
+    <script>
+        let results = [];
+        let currentIndex = 0;
+        let player = null;
+        let playerReady = false;
+
+        const searchInput = document.getElementById('searchInput');
+        const searchBtn = document.getElementById('searchBtn');
+        const loadingSection = document.getElementById('loadingSection');
+        const noResults = document.getElementById('noResults');
+        const resultsSection = document.getElementById('resultsSection');
+        const videoPlayer = document.getElementById('videoPlayer');
+        const prevBtn = document.getElementById('prevBtn');
+        const nextBtn = document.getElementById('nextBtn');
+        const currentIndexEl = document.getElementById('currentIndex');
+        const totalResultsEl = document.getElementById('totalResults');
+        const currentTimeEl = document.getElementById('currentTime');
+
+        // Called automatically when YouTube API is ready
+        function onYouTubeIframeAPIReady() {
+            playerReady = true;
+        }
+
+        // Search functionality
+        async function search() {
+            const query = searchInput.value.trim();
+            if (!query) return;
+
+            // Show loading
+            loadingSection.classList.remove('hidden');
+            noResults.classList.add('hidden');
+            resultsSection.classList.add('hidden');
+            searchBtn.disabled = true;
+
+            try {
+                const response = await fetch(`/api/search?q=${encodeURIComponent(query)}`);
+                results = await response.json();
+                currentIndex = 0;
+
+                loadingSection.classList.add('hidden');
+                searchBtn.disabled = false;
+
+                if (results.length === 0) {
+                    noResults.classList.remove('hidden');
+                } else {
+                    resultsSection.classList.remove('hidden');
+                    totalResultsEl.textContent = results.length;
+                    playCurrentResult();
+                }
+            } catch (error) {
+                console.error('Search error:', error);
+                loadingSection.classList.add('hidden');
+                searchBtn.disabled = false;
+                noResults.classList.remove('hidden');
+            }
+        }
+
+        function extractVideoId(url) {
+            const match = url.match(/(?:v=|\/)([0-9A-Za-z_-]{11})/);
+            return match ? match[1] : null;
+        }
+
+        function formatTime(seconds) {
+            const mins = Math.floor(seconds / 60);
+            const secs = Math.floor(seconds % 60);
+            return `${mins}:${secs.toString().padStart(2, '0')}`;
+        }
+
+        function playCurrentResult() {
+            if (results.length === 0) return;
+
+            const result = results[currentIndex];
+            const videoId = extractVideoId(result.videoURL);
+            const startTime = Math.floor(result.start);
+
+            // Update UI
+            currentIndexEl.textContent = currentIndex + 1;
+            currentTimeEl.textContent = formatTime(result.start);
+            prevBtn.disabled = currentIndex === 0;
+            nextBtn.disabled = currentIndex === results.length - 1;
+
+            // Destroy existing player if any
+            if (player) {
+                player.destroy();
+                player = null;
+            }
+
+            // Create a fresh div for the player
+            videoPlayer.innerHTML = '<div id="ytplayer"></div>';
+
+            // Create new YouTube player
+            player = new YT.Player('ytplayer', {
+                height: '100%',
+                width: '100%',
+                videoId: videoId,
+                playerVars: {
+                    'autoplay': 1,
+                    'start': startTime,
+                    'rel': 0,
+                    'modestbranding': 1
+                },
+                events: {
+                    'onReady': function(event) {
+                        event.target.playVideo();
+                    }
+                }
+            });
+        }
+
+        function nextResult() {
+            if (currentIndex < results.length - 1) {
+                currentIndex++;
+                playCurrentResult();
+            }
+        }
+
+        function prevResult() {
+            if (currentIndex > 0) {
+                currentIndex--;
+                playCurrentResult();
+            }
+        }
+
+        // Event listeners
+        searchBtn.addEventListener('click', search);
+
+        searchInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') search();
+        });
+
+        nextBtn.addEventListener('click', nextResult);
+        prevBtn.addEventListener('click', prevResult);
+
+        // Keyboard navigation
+        document.addEventListener('keydown', (e) => {
+            if (e.target === searchInput) return;
+            
+            if (e.key === 'ArrowRight') {
+                nextResult();
+            } else if (e.key === 'ArrowLeft') {
+                prevResult();
+            }
+        });
+    </script>
+</body>
+</html>
