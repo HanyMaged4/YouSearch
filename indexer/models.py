@@ -13,7 +13,7 @@ class Videos(models.Model):
 class Words(models.Model):
     wordID = models.AutoField(primary_key=True)
     word = models.CharField(max_length=255, unique=True, db_index=True)
-
+    cnt = models.IntegerField(default=1)
     def __str__(self):
         return f"{self.word} ({self.wordID})"
     
@@ -31,8 +31,8 @@ class Indexing(models.Model):
     posetion = models.IntegerField(null=False)
 
     class Meta:
-        unique_together = ('word', 'sentence' , 'posetion')
+        unique_together = ('word', 'sentence', 'posetion')
+        ordering = ['word_id', 'sentence_id']  # Add this line
     
     def __str__(self):
-        return f"{self.word.word} in {self.video.videoID} [{self.start}-{self.end}]"
-    
+        return f"{self.word.word} in {self.sentence.video.videoID} [{self.sentence.start}]"
